@@ -5,5 +5,6 @@ const knex = require('knex');
 const config = require('./knexfile')['development'];
 const database = knex(config);
 
-
-app.listen(4000, () => console.log('Listening'))
+const bodyParser = require('body-parser');
+app.use(bodyParser.json())
+const bcrypt = require('bcrypt');
