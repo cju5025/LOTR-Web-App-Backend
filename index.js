@@ -4,6 +4,8 @@ const app = express();
 const cors = require('cors');
 app.use(cors());
 
+require('dotenv').config()
+
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 
@@ -65,8 +67,7 @@ app.post('/login', (request, response) => {
         if (!arePasswordsTheSame) throw new Error ('Incorrect Password')
 
         const payload = { username: user.username }
-        const secret = 'NANANA' // HIDE THIS!!
-
+        const secret = process.env.SECRET
         jwt.sign(payload, secret, (error, token) => {
             if (error) throw new Error ("Signing didn't work")
             response.json({ token })
