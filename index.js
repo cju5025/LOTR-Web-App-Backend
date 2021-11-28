@@ -17,6 +17,7 @@ Model.knex(database);
 const bodyParser = require('body-parser');
 app.use(bodyParser.json())
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('./Models/User.js');
 
@@ -42,5 +43,35 @@ app.post('/users', (request, response) => {
             response.json({ user })
         }).catch(error => response.json(error.message))
 });
+
+app.post('/login', (request, response) => {
+    const { user } = request.body
+    
+    database('users')
+    .select()
+    .where({ username: user.username })
+    .first()
+    .then(retrievedUser => {
+        if (!retrievedUser) throw new Error ('User not found')
+        return Promise.all([
+            bcrypt.compare(user.password, retrievedUser.password),
+            Promise.resolve(retrievedUser)
+        ])
+    })
+    .then(results => {
+        const arePasswordsTheSame = results[0]
+        const user = results[1]
+
+        if (!arePasswordsTheSame) throw new Error ('Incorrect Password')
+
+        const payload = { username: user.username }
+        const secret = 'NANANA' // HIDE THIS!!
+
+        jwt.sign(payload, secret, (error, token) => {
+            if (error) throw new Error ("Signing didn't work")
+            response.json({ token })
+        })
+    }).catch(error => response.json(error.message))
+})
 
 app.listen(4000);
