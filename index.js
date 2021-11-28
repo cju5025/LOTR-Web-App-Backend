@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 app.use(cors());
 
-require('dotenv').config()
+require('dotenv').config();
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
@@ -32,6 +32,7 @@ app.get('/users', (request, response) => {
 
 app.post('/users', (request, response) => {
     const { user } = request.body
+
     bcrypt.hash(user.password, 12)
         .then(hashedPassword => {
             return database('user')
@@ -55,6 +56,7 @@ app.post('/login', (request, response) => {
     .first()
     .then(retrievedUser => {
         if (!retrievedUser) throw new Error ('User not found')
+
         return Promise.all([
             bcrypt.compare(user.password, retrievedUser.password),
             Promise.resolve(retrievedUser)
@@ -68,7 +70,7 @@ app.post('/login', (request, response) => {
 
         const payload = { username: user.username }
         const secret = process.env.SECRET
-        
+
         jwt.sign(payload, secret, (error, token) => {
             if (error) throw new Error ("Signing didn't work")
             response.json({ token })
