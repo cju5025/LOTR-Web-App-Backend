@@ -68,6 +68,7 @@ app.post('/login', (request, response) => {
 
         const payload = { username: user.username }
         const secret = process.env.SECRET
+        
         jwt.sign(payload, secret, (error, token) => {
             if (error) throw new Error ("Signing didn't work")
             response.json({ token })
